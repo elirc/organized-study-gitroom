@@ -22,6 +22,7 @@ Plan: add `orgId` to the `where`; Prisma compound where on non-unique fields nee
 What could go wrong: `update` on a compound non-unique where won't compile → use the same approach the sibling uses.
 Checks: two orgs, tag id from org A, PUT from org B → expect 4xx/no-op.
 Review questions: are there other `update({where: {id}})`-only methods with an unused orgId param? (Grep — that's ticket M2's audit.)
+**Check (audit warm-up):** the repositories have more than a dozen id-only `update({ where: { id } })` calls. Examples are `posts.repository.ts` L103 `updateImages`, L367 `updatePost`, L393 `changeState`, L655 `updateMessage`, and `integration.repository.ts` L365 `updateNameAndUrl`. For each one, decide whether it is reachable with a user-supplied id (follow the callers into `apps/backend/src/api/routes/`) or only from workflows, and whether a caller already did an org-scoped read. `updateNameAndUrl` is the worked example: `setNickname` checks `getIntegrationById(org.id, id)` first (`integrations.controller.ts` L144–150). `editTag` is the one whose signature takes `orgId` and then ignores it.
 Interview story potential: "found and fixed an IDOR with a one-line where-clause change and wrote the cross-tenant regression test."
 
 ## Ticket J3: Fix `createPopularPosts` inserting literal strings
@@ -62,7 +63,7 @@ Interview story: small, but pairs with J8 as "guard hygiene".
 Difficulty: Medium — 2-3 h. Skills: Nest decorators, guards.
 Story: `request.path.indexOf('/auth') > -1` also matches `/oauth/...` and any future route containing the substring — a fragile allow-list.
 Anchors: [permissions.guard.ts L24-L31](../../../apps/backend/src/services/auth/permissions/permissions.guard.ts#L22-L64).
-Plan: introduce `@SkipPolicies()` metadata + `Reflector` check, mirroring how `CheckPolicies` already works ([permissions.ability.ts](../../../apps/backend/src/services/auth/permissions/permissions.ability.ts#L1-L8)); annotate the three intended controllers.
+Plan: introduce `@SkipPolicies()` metadata + `Reflector` check, mirroring how `CheckPolicies` already works ([permissions.ability.ts](../../../apps/backend/src/services/auth/permissions/permissions.ability.ts#L1-L7)); annotate the three intended controllers.
 What could go wrong: missing one bypassed route = lockout; enumerate current matches first (grep controllers for paths containing `auth`, `social-connect`, `provider`).
 Interview story: "replaced string matching with declarative metadata — fail-closed authorization."
 

@@ -20,7 +20,7 @@ A **boundary** is where one component's responsibility ends and its promises to 
 3. **Determinism boundary** — workflow/activity split; tool-enforced.
 4. **Provider boundary** — the typed-failure taxonomy ([social.abstract.ts](../../../libraries/nestjs-libraries/src/integrations/social.abstract.ts#L5-L27)); strings quarantined per provider.
 5. **Process boundary** — backend/orchestrator share code but communicate only via Postgres/Redis/Temporal. Hidden coupling: both may refresh the same token concurrently (see [debugging scenario 4](../05-quality-engineering/03-systematic-debugging.md)).
-6. **Ownership boundary in data** — `libraries/nestjs-libraries/database` modules pair service+repository per aggregate (posts/, integrations/, organizations/…): a proto-"domain module" layout worth naming in interviews.
+6. **Ownership boundary in data** — `libraries/nestjs-libraries/src/database/prisma/*` modules pair service+repository per aggregate (posts/, integrations/, organizations/…): a proto-"domain module" layout worth naming in interviews.
 
 ## How to *use* this in review
 

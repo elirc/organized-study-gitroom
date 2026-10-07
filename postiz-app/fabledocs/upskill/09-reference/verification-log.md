@@ -83,4 +83,14 @@ Date: 2026-07-10. Environment: Windows 11, repo at `03 Master Projects\masterpos
 9. CLAUDE.md says frontend is "Vite ReactJS"; it is Next.js 16 (`apps/frontend/package.json` dev script `next dev -p 4200`).
 10. Password-reset JWT (`forgot`, `auth.service.ts` L217–233) has a custom `expires` claim checked manually and is not single-use.
 
+## Re-check on 2026-10-07 (study copy `elirc/organized-study-gitroom`)
+
+Static re-check of `fabledocs/upskill/` and `docs2/`; nothing was installed or run.
+
+- **Defects 1–7 and 10 re-confirmed at the same lines.** `editTag` is at L804 and `deleteTag` at L816. `createPopularPosts` writes literal `'category'` at L736. Both `/auth` conditions sit at `permissions.guard.ts` L25–26. `deletePost` returns `{ error: true }` at L679. `rawBody` + `console.log` are at `posts.controller.ts` L174–177. `signJWT` at L42–44 calls `sign` with no options.
+- **Anchors:** every `#L` link and `path:N` citation lands inside its file, with one exception: `permissions.ability.ts#L1-L8` pointed one line past a 7-line file and now reads `#L1-L7`. A content spot-check of the posts service/repository, guard, calendar and settings anchors found them on the named code. Many `docs2/` anchors deliberately point at the *insertion site* for a feature that does not exist yet (e.g. `privateNote`), so the symbol is absent by design.
+- **Path fix:** `libraries/nestjs-libraries/database` → `libraries/nestjs-libraries/src/database/prisma/*` in `01-boundaries-and-layers.md`.
+- **Test evidence:** still zero `*.spec.ts`/`*.test.ts` outside `node_modules`. The committed `reports/junit.xml` (11 `PermissionsService` cases, timestamp 2025-03-24) is a stale artifact of a spec that is not in this tree. R2 now says so.
+- **New review contrast (R3):** `setNickname` scopes its read by org (`integrations.controller.ts` L144–150) before an id-only write (`integration.repository.ts` L365–375). It is safe today, and it is a useful comparison with `editTag`'s unscoped write.
+
 Labeled "investigate" (not confirmed): behavior of `changeDate` when `getPostById` returns null (`posts.service.ts` L849–859 dereferences `.state` unguarded); `IntegrationManager.getSocialIntegration` non-null assertion on unknown identifier (`integration.manager.ts` L170–172); `functionIntegration` dispatching arbitrary `body.name` methods on providers (`integrations.controller.ts` L341–352).
